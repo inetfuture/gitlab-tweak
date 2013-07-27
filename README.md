@@ -1,3 +1,5 @@
+**Tweaked based on official 5-4-stable branch, and the way of doing it is quick and dirty.**
+
 ## GitLab: self hosted Git management software
 
 ![logo](https://raw.github.com/gitlabhq/gitlabhq/master/public/gitlab_logo.png)
