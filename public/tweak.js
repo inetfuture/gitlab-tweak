@@ -166,6 +166,7 @@ function genMdFileTOCAndAdjustHyperlink() {
   var fileTitleToc = fileTitleFooter.find('.t-file-title-toc')
   .tocify({
     context: fileContent,
+    selectors: 'h1,h2,h3,h4,h5,h6',
     showAndHide: false,
     hashGenerator: 'pretty',
     scrollTo: 38
