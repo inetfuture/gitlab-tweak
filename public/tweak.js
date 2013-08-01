@@ -4,6 +4,12 @@
  */
 
 /**
+ * Config
+ */
+
+var PRIVATE_TOKEN = 'xYDh7cpVX8BS2unon1hp';
+
+/**
  * Globals.
  */
 
@@ -17,21 +23,18 @@ $(function () {
   handleAll();
   mapUrlHandler(location.pathname, [
     { pattern: /^\/[^\/]+\/[^\/]+$/, handle: handleProjectDashboard },
-    { pattern: /^.+\/blob\/[^\/]+\/.+\.md$/, handle: handleMdView }
+    { pattern: /^.+\/tree\/.+/, handle: handleTreeView },
+    { pattern: /^.+\/blob\/[^\/]+\/.+\.md$/, handle: handleMdBlobView }
   ]);
 });
 
 $(document).ajaxSuccess(function (event, xhr, settings) {
   mapUrlHandler(settings.url, [
     { pattern: /.+\?limit=20/, handle: handleDashboardActivities },
-    { pattern: /.+notes\.js\?target_type=issue.+/, handle: handleIssueComments },
-    { pattern: /.+\/refs\/.+\/logs_tree\/.+/, handle: handleLogsTree }
+    { pattern: /.+\/refs\/.+\/logs_tree\/.+/, handle: handleLogsTree },
+    { pattern: /.+notes\.js\?target_type=issue.+/, handle: handleIssueComments }
   ]);
 });
-
-/**
- * Document loaded url handlers.
- */
 
 /**
  * Parse useful data from dom elements and assign them to globals for later use.
@@ -48,6 +51,12 @@ function initGlobals () {
     $('h1.project_name span').text().replace(/\s/, '').replace(/\s/, '').replace(' ', '-').toLowerCase();
 }
 
+
+
+/**
+ * Document loaded url handlers.
+ */
+
 /**
  * Handle tweak tasks for all pages.
  */
@@ -56,6 +65,33 @@ function handleAll() {
 
   addProjectSelect();
 }
+
+/**
+ * Handle tweak tasks for project dashboard page.
+ */
+function handleProjectDashboard() {
+  //redirectToFilesTab();
+}
+
+/**
+ * Handle tweak tasks for files tree view.
+ */
+function handleTreeView() {
+  genMdFileTOC();
+}
+
+/**
+ * Handle tweak tasks for markdown file blob view.
+ */
+function handleMdBlobView() {
+  var slideLink = $('<a class="btn btn-tiny" target="_blank">slide</a>')
+  .attr('href', '/reveal/md.html?p=' + location.pathname.replace('blob', 'raw'));
+  $('.file_title .options .btn-group a:nth-child(2)').after(slideLink);
+
+  genMdFileTOC();
+}
+
+
 
 /**
  * Add project select on the top bar.
@@ -77,17 +113,17 @@ function addProjectSelect() {
   var currentProjectPath = '/' +
     $('h1.project_name span').text().replace(/\s/, '').replace(/\s/, '').replace(' ', '-').toLowerCase();
   $('#t-project-list').append(options)
-    .val(currentProjectPath)
-    .change(function () {
-      location.href = $(this).val();
-    });
+  .val(currentProjectPath)
+  .change(function () {
+    location.href = $(this).val();
+  });
 }
 
 /**
- * Handle tweak tasks for project dashboard page.
+ * Redirect to 'Files' tab if the url is not surfixed with '#' character.
  */
-function handleProjectDashboard() {
-  // Redirect to 'Files' tab if the url is not surfixed with '#' character.
+function redirectToFilesTab() {
+  //
   if (location.href.indexOf('#') === -1) {
     myGitLabAPIGet('projects/' + currentProjectID, null, function (data) {
       if (data.default_branch !== null) {
@@ -97,27 +133,90 @@ function handleProjectDashboard() {
   }
 }
 
-function handleMdView() {
-  console.log(1);
-  var slideLink = $('<a class="btn btn-tiny" target="_blank">slide</a>')
-    .attr('href', '/reveal/md.html?p=' + location.pathname.replace('blob', 'raw'));
-  $('.file_title .options .btn-group a:nth-child(2)').after(slideLink);
+/**
+ * Generate TOC for markdown file.
+ */
+function genMdFileTOC() {
+  // Assume there is only one .file_holder.
+  var fileHolder = $('.file_holder');
+  if (fileHolder.length !== 1) {
+    return;
+  }
+
+  var fileTitle = fileHolder.find('.file_title'),
+    fileContent = fileHolder.find('.file_content');
+
+  fileTitle.wrapInner('<div class="t-file-title-header" />')
+  .scrollToFixed();
+
+  var fileTitleFooter = $('<div class="t-file-title-footer"><div class="t-file-title-toc navbar-inner" /></div>')
+  .appendTo(fileTitle)
+  .hide();
+
+  // Some special characters will cause tocify hash error, replace them with empty string.
+  fileContent.find('h1, h2, h3, h4, h5').each(function () {
+    $(this).html($(this).html().replace(/\./g, ''));
+  });
+
+  var fileTitleToc = fileTitleFooter.find('.t-file-title-toc')
+  .tocify({
+    context: fileContent,
+    showAndHide: false,
+    hashGenerator: 'pretty',
+    scrollTo: 38
+  });
+
+  $('<span class="t-file-title-toc-toggler options">' +
+    '<div class="btn-group tree-btn-group">' +
+      '<a class="btn btn-tiny" title="Table of Content, \'m\' for shortcut.">TOC</a>' +
+    '</div>' +
+  '</span>')
+  .click(function () {
+    fileTitleFooter.toggle();
+  })
+  .appendTo(fileTitle.find('.t-file-title-header'));
+
+  $(document).keyup(function(e) {
+    switch (e.which) {
+      case 27:
+        fileTitleFooter.hide();
+        break;
+      case 77:
+        fileTitleFooter.toggle();
+        break;
+    }
+  });
+
+  // Jumpt to ahchor if has one.
+  if (location.hash) {
+    var anchor = location.hash.slice(1);
+    fileTitleToc.find('li[data-unique="' + anchor + '"] a').click();
+  }
 }
+
+
+
 
 /**
  * Ajax success url handlers.
  */
 
+/**
+ * Handle tweak tasks for dashboard activities.
+ */
 function handleDashboardActivities() {
   $('.note-file-attach').commonFancybox();
 }
 
+/**
+ * Handle tweak tasks for issue comments.
+ */
 function handleIssueComments() {
   $('.note-image-attach').each(function () {
     var img = $(this);
     var wrapper = $('<a class="t-fancybox-note-image-attach" rel="gallery-note-image-attach" />')
-      .attr('href', img.attr('src'))
-      .attr('title', img.attr('alt'));
+    .attr('href', img.attr('src'))
+    .attr('title', img.attr('alt'));
     img.wrap(wrapper);
     wrapper.commonFancybox();
   });
@@ -125,9 +224,15 @@ function handleIssueComments() {
   $('.t-fancybox-note-image-attach').commonFancybox();
 }
 
+/**
+ * Handle tweak tasks for git logs tree.
+ */
 function handleLogsTree() {
   // Nothing to do.
 }
+
+
+
 
 /**
  * Helpers.
@@ -150,10 +255,13 @@ function mySetInterval(fn, interval) {
 }
 
 function myGitLabAPIGet(url, data, cb) {
-  $.get('/api/v3/' + url + '?private_token=xYDh7cpVX8BS2unon1hp', data, function (data) {
+  $.get('/api/v3/' + url + '?private_token=' + PRIVATE_TOKEN, data, function (data) {
     cb(data);
   });
 }
+
+
+
 
 /**
  * Extensions

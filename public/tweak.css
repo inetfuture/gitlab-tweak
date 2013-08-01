@@ -1,0 +1,24 @@
+.t-file-title-toc-toggler {
+  float: right;
+  cursor: pointer;
+}
+
+.t-file-title-footer {
+  margin-top: 9px;
+  position: relative;
+}
+
+.t-file-title-toc {
+  padding: 0;
+  width: 300px;
+  position: absolute;
+  right: -10px;
+}
+
+.t-file-title-toc .nav-list {
+  padding: 0;
+}
+
+.t-file-title-toc .nav-list li {
+  line-height: 14px;
+}

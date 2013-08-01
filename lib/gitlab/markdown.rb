@@ -90,7 +90,6 @@ module Gitlab
     def parse(text)
       parse_references(text) if @project
       parse_emoji(text)
-      text = parse_toc(text)
 
       text
     end
