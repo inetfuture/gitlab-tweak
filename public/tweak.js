@@ -46,9 +46,21 @@ function initGlobals () {
       return true;
     }
   });
+
+  currentUser = $('.profile-pic').attr('href').slice(3);
+
   currentProjectID = $(document.body).attr('data-project-id');
-  currentProjectPath = '/' +
-    $('h1.project_name span').text().replace(/\s/, '').replace(/\s/, '').replace(' ', '-').toLowerCase();
+  currentProjectPath = '/';
+  if ($('h1.project_name span').length) {
+    currentProjectPath += $('h1.project_name span').text()
+    .replace(/\s/, '').replace(/\s/, '').replace(' ', '-').toLowerCase();
+  } else {
+    currentProjectPath += currentUser + '/' + $('h1.project_name').text().replace(' ', '-').toLowerCase();
+  }
+
+  currentBranch = $('.project-refs-select').val();
+
+  console.log(currentUser, currentProjectID, currentProjectPath, currentBranch);
 }
 
 
@@ -77,7 +89,7 @@ function handleProjectDashboard() {
  * Handle tweak tasks for files tree view.
  */
 function handleTreeView() {
-  genMdFileTOC();
+  genMdFileTOCAndAdjustHyperlink();
 }
 
 /**
@@ -88,7 +100,7 @@ function handleMdBlobView() {
   .attr('href', '/reveal/md.html?p=' + location.pathname.replace('blob', 'raw'));
   $('.file_title .options .btn-group a:nth-child(2)').after(slideLink);
 
-  genMdFileTOC();
+  genMdFileTOCAndAdjustHyperlink();
 }
 
 
@@ -103,15 +115,13 @@ function addProjectSelect() {
   $('.navbar .container .nav li:nth-child(2)').after(projectSelectForm);
 
   var options = projectOpts.map(function (project) {
-    return $('<option />').val(project.url).text(project.label.slice(9));
+    return $('<option />').val(project.url.toLowerCase()).text(project.label.slice(9));
   });
 
   if (!$('h1.project_name span').length) {
     options.unshift('<option>Go to Project</option>');
   }
 
-  var currentProjectPath = '/' +
-    $('h1.project_name span').text().replace(/\s/, '').replace(/\s/, '').replace(' ', '-').toLowerCase();
   $('#t-project-list').append(options)
   .val(currentProjectPath)
   .change(function () {
@@ -136,7 +146,7 @@ function redirectToFilesTab() {
 /**
  * Generate TOC for markdown file.
  */
-function genMdFileTOC() {
+function genMdFileTOCAndAdjustHyperlink() {
   // Assume there is only one .file_holder.
   var fileHolder = $('.file_holder');
   if (fileHolder.length !== 1) {
@@ -153,17 +163,17 @@ function genMdFileTOC() {
   .appendTo(fileTitle)
   .hide();
 
-  // Some special characters will cause tocify hash error, replace them with empty string.
-  fileContent.find('h1, h2, h3, h4, h5').each(function () {
-    $(this).html($(this).html().replace(/\./g, ''));
-  });
-
   var fileTitleToc = fileTitleFooter.find('.t-file-title-toc')
   .tocify({
     context: fileContent,
     showAndHide: false,
     hashGenerator: 'pretty',
     scrollTo: 38
+  });
+
+  // Some special characters will cause tocify hash error, replace them with empty string.
+  fileHolder.find('[data-unique]').each(function () {
+    $(this).attr('data-unique', $(this).attr('data-unique').replace(/\./g, ''));
   });
 
   $('<span class="t-file-title-toc-toggler options">' +
@@ -192,6 +202,24 @@ function genMdFileTOC() {
     var anchor = location.hash.slice(1);
     fileTitleToc.find('li[data-unique="' + anchor + '"] a').click();
   }
+
+
+  // Adjust hyperlink.
+  fileContent.find('a').each(function () {
+    var href = $(this).attr('href');
+    // If not start with '/' and doesn't have '//', consider it as a relative path.
+    if (/^[^\/]/.test(href) && !/.*\/\/.*/.test(href)) {
+      var middlePath;
+      // If end with .ext, this is a file path, otherwise is a directory path.
+      if (/.*\.[^\/]+$/.test(href)) {
+        middlePath = '/blob/';
+      } else {
+        middlePath = '/tree/';
+      }
+
+      $(this).attr('href', currentProjectPath + middlePath + currentBranch + '/' + href);
+    }
+  });
 }
 
 
