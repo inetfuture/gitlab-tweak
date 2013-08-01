@@ -7,8 +7,8 @@
 - <del>Add *table* and *toc* support to .md file.</del>
 - <del>Add *slide view* to .md file.<del>
 - <del>Add *Go to project* select on page header.</del>
-- Add more convient toc navigation on md view.
-- Fix README.md file link error in tree view.
+- <del>Add more convient toc navigation on md view.</del>
+- <del>Fix README.md file link error in tree view.</del>
 - Re-design issue tracker.
 
 -------------------------------------------------------------------------------------------------------
