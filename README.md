@@ -1,4 +1,4 @@
-## Tweaked based on official 5-4-stable branch, and the way of doing it is quick and dirty.
+## Tweaked based on official 6-1-stable branch, and the way of doing it is quick and dirty.
 
 ## To Do List
 
