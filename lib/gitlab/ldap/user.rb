@@ -13,6 +13,11 @@ module Gitlab
         def find_or_create(auth)
           @auth = auth
 
+          # Adapt to Augmentum IES ldap.
+          real_email = auth[:extra].values[0][:augemail]
+          auth[:email] = real_email
+          auth.info.email = real_email[0]
+
           if uid.blank? || email.blank?
             raise_error("Account must provide an uid and email address")
           end
