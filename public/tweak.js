@@ -82,7 +82,7 @@ function handleAll() {
  * Handle tweak tasks for project dashboard page.
  */
 function handleProjectDashboard() {
-  //redirectToFilesTab();
+  // Nothing to do.
 }
 
 /**
@@ -127,20 +127,6 @@ function addProjectSelect() {
   .change(function () {
     location.href = $(this).val();
   });
-}
-
-/**
- * Redirect to 'Files' tab if the url is not surfixed with '#' character.
- */
-function redirectToFilesTab() {
-  //
-  if (location.href.indexOf('#') === -1) {
-    myGitLabAPIGet('projects/' + currentProjectID, null, function (data) {
-      if (data.default_branch !== null) {
-        location.href += '/tree/' + data.default_branch;
-      }
-    });
-  }
 }
 
 /**
@@ -208,6 +194,16 @@ function genMdFileTOCAndAdjustHyperlink() {
   // Adjust hyperlink.
   fileContent.find('a').each(function () {
     var href = $(this).attr('href');
+
+    // Sine 6-2-stable, gitlab will handle relative links when rendering markdown,
+    // but it didn't work, all relative links fallback to wikis path,
+    // I didn't have much time to figure out why, so I did this quick fix.
+    var gitlabPrefixedWikisPath = currentProjectPath + '/wikis/';
+    var gitlabPrefixedWikisPathIndex = href.indexOf(gitlabPrefixedWikisPath);
+    if (gitlabPrefixedWikisPathIndex != -1) {
+      href = href.slice(gitlabPrefixedWikisPath.length);
+    }
+
     // If not start with '/' and doesn't have '//', consider it as a relative path.
     if (/^[^\/]/.test(href) && !/.*\/\/.*/.test(href)) {
       var middlePath;
@@ -234,7 +230,7 @@ function genMdFileTOCAndAdjustHyperlink() {
  * Handle tweak tasks for dashboard activities.
  */
 function handleDashboardActivities() {
-  //$('.note-image-attach').commonFancybox();
+  // Nothing to do.
 }
 
 /**
@@ -315,4 +311,3 @@ if (typeof String.prototype.endsWith !== 'function') {
     }
   });
 })(jQuery);
-

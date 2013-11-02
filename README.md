@@ -1,14 +1,13 @@
-## Tweaked based on official 5-4-stable branch, and the way of doing it is quick and dirty.
+## Tweaked based on official 6-2-stable branch, and the way of doing it is quick and dirty.
 
 ## To Do List
 
-- <del>Add *fancy box* to issue image attachments.</del>
+- <del>Add *fancy box* to issue's image attachments.</del>
 - <del>Refine style of md view.</del>
-- <del>Add *table* and *toc* support to .md file.</del>
-- <del>Add *slide view* to .md file.<del>
+- <del>Add more convient *toc* navigation on md view.</del>
+- <del>Add *slide view* to md file.<del>
 - <del>Add *Go to project* select on page header.</del>
-- <del>Add more convient toc navigation on md view.</del>
-- <del>Fix README.md file link error in tree view.</del>
+- <del>Fix README.md link error in tree view.</del>
 - Re-design issue tracker.
 
 -------------------------------------------------------------------------------------------------------

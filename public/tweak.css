@@ -1,3 +1,39 @@
+.wiki h1, h2, h3, h4, h5, h6 {
+  padding: 0 10px;
+  margin-top: 0;
+}
+
+.wiki h1 {
+  font-size: 26px;
+  line-height: 40px;
+  border-left: solid 8px #F0785D;
+}
+
+.wiki h2 {
+  font-size: 22px;
+  line-height: 36px;
+  border-left: solid 8px #E0B21B;
+}
+
+.wiki h3 {
+  font-size: 18px;
+  line-height: 32px;
+  border-left: solid 8px #94E01B;
+}
+
+.wiki h4 {
+  font-size: 16px;
+  line-height: 28px;
+  border-left: solid 8px #1BB2E0;
+}
+
+.wiki h5 {
+  font-size: 14px;
+  line-height: 24px;
+  border-left: solid 8px #EB8BF0;
+}
+
+
 .t-file-title-toc-toggler {
   float: right;
   cursor: pointer;
